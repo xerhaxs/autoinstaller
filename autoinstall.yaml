@@ -16,6 +16,26 @@ autoinstall:
         dhcp4: true
         dhcp6: false
 
+  # --- Hostname ---
+  hostname: UbuntuLaptop
+
+  # --- User Accounts ---
+  identity:
+    hostname: UbuntuLaptop
+    username: azubi
+    realname: "Azubi"
+    # Passwort-Hash generieren mit:
+    # mkpasswd --method=yescrypt
+    password: "$6$XzcAQQzOQ3r5ktQx$Om39t3IwvW8.NMf3vscQ4KuqtZB6XIjbyw1wbLKHnX.4LXySn9lW6hSG0Y3EgAfgqnGWR6TqTN07d6goJzBPJ0"
+
+  # sudo-Rechte via late-commands setzen
+  # (identity unterstützt keine Gruppen direkt)
+
+  # --- SSH ---
+  ssh:
+    install-server: false
+    allow-pw: false
+
   # --- Storage ---
   storage:
     config:
@@ -70,28 +90,6 @@ autoinstall:
         device: format-root
         path: /
 
-  # --- User Accounts ---
-  user-data:
-    users:
-      # Azubi mit Passwort-Login und sudo-Rechten (Passwort erforderlich)
-      # Passwort-Hash generieren mit:
-      # mkpasswd --method=yescrypt
-      - name: azubi
-        gecos: "Azubi"
-        groups: [sudo, adm]
-        sudo: ALL=(ALL:ALL) ALL
-        shell: /bin/bash
-        lock_passwd: false
-        passwd: "$6$XzcAQQzOQ3r5ktQx$Om39t3IwvW8.NMf3vscQ4KuqtZB6XIjbyw1wbLKHnX.4LXySn9lW6hSG0Y3EgAfgqnGWR6TqTN07d6goJzBPJ0"
-
-  # --- Hostname ---
-  hostname: UbuntuLaptop
-
-  # --- SSH ---
-  ssh:
-    install-server: false
-    allow-pw: false
-
   # --- APT Packages ---
   packages:
     # Basis & Build-Tools
@@ -143,6 +141,10 @@ autoinstall:
     - curtin in-target --target=/target -- apt-get update -y
     - curtin in-target --target=/target -- apt-get upgrade -y
     - curtin in-target --target=/target -- apt-get autoremove -y
+
+    # sudo-Rechte für azubi setzen (mit Passwortpflicht)
+    - curtin in-target --target=/target -- usermod -aG sudo azubi
+    - curtin in-target --target=/target -- usermod -aG adm azubi
 
     # pip auf neuesten Stand bringen
     - curtin in-target --target=/target -- pip3 install --upgrade pip
