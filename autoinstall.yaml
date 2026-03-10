@@ -72,9 +72,6 @@ autoinstall:
     - curtin in-target --target=/target -- usermod -aG sudo azubi
     - curtin in-target --target=/target -- usermod -aG adm azubi
 
-    # pip auf neuesten Stand bringen
-    - curtin in-target --target=/target -- pip3 install --upgrade pip --break-system-packages
-
     # Adafruit CircuitPython DHT Bibliothek
     - curtin in-target --target=/target -- pip3 install adafruit-circuitpython-dht --break-system-packages
 
