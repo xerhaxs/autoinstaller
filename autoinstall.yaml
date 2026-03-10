@@ -70,8 +70,8 @@ autoinstall:
     - curtin in-target --target=/target -- chmod +x /opt/arduino-ide.AppImage
     - curtin in-target --target=/target -- chown azubi:azubi /opt/arduino-ide.AppImage
 
-    # Create Arduino IDE desktop shortcut
-    - curtin in-target --target=/target -- bash -c "cat > /usr/share/applications/arduino-ide.desktop << 'EOF'\n[Desktop Entry]\nName=Arduino IDE\nExec=/opt/arduino-ide.AppImage\nIcon=arduino\nType=Application\nCategories=Development;\nEOF"
+    # Create Arduino IDE desktop shortcut using printf
+    - curtin in-target --target=/target -- bash -c "printf '[Desktop Entry]\nName=Arduino IDE\nExec=/opt/arduino-ide.AppImage\nIcon=arduino\nType=Application\nCategories=Development;\n' > /usr/share/applications/arduino-ide.desktop"
 
     # Install Raspberry Pi Imager via official apt repository
     - curtin in-target --target=/target -- bash -c "curl -fsSL https://archive.raspberrypi.com/debian/raspberrypi.gpg.key | gpg --dearmor -o /etc/apt/keyrings/raspberrypi.gpg"
