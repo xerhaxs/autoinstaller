@@ -62,9 +62,6 @@ autoinstall:
     # Install Java runtime (Arduino IDE dependency)
     - curtin in-target --target=/target -- apt-get install -y openjdk-17-jre
 
-    # Install Nix dependency
-    - curtin in-target --target=/target -- apt-get install -y xz-utils
-
     # Install German language packs
     - curtin in-target --target=/target -- apt-get install -y language-pack-de
 
@@ -89,12 +86,6 @@ autoinstall:
 
     # Disable Apport crash reporter
     - curtin in-target --target=/target -- systemctl disable apport
-
-    # Install Nix package manager (single-user mode)
-    - curtin in-target --target=/target -- bash -c "curl -L https://nixos.org/nix/install | sh -s -- --no-daemon"
-
-    # Add Nix to azubi shell profile
-    - curtin in-target --target=/target -- bash -c "echo '. /home/azubi/.nix-profile/etc/profile.d/nix.sh' >> /home/azubi/.bashrc"
 
   # --- Reboot after installation ---
   shutdown: reboot
