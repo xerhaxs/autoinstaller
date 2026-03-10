@@ -56,33 +56,38 @@ autoinstall:
     # Install LibreOffice with German language support
     - curtin in-target --target=/target -- apt-get install -y libreoffice libreoffice-l10n-de libreoffice-help-de
 
-    # Install Firefox
-    - curtin in-target --target=/target -- apt-get install -y firefox
-
-    # Install Java runtime (Arduino IDE dependency)
+    # Install Java runtime
     - curtin in-target --target=/target -- apt-get install -y openjdk-17-jre
+
+    # Install Visual Studio Code via Microsoft apt repository
+    - curtin in-target --target=/target -- bash -c "curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /etc/apt/keyrings/microsoft.gpg"
+    - curtin in-target --target=/target -- bash -c "echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main' > /etc/apt/sources.list.d/vscode.list"
+    - curtin in-target --target=/target -- apt-get update -y
+    - curtin in-target --target=/target -- apt-get install -y code
+
+    # Install Arduino IDE via official AppImage
+    - curtin in-target --target=/target -- bash -c "curl -fsSL https://downloads.arduino.cc/arduino-ide/arduino-ide_latest_Linux_64bit.AppImage -o /opt/arduino-ide.AppImage"
+    - curtin in-target --target=/target -- chmod +x /opt/arduino-ide.AppImage
+    - curtin in-target --target=/target -- chown azubi:azubi /opt/arduino-ide.AppImage
+
+    # Create Arduino IDE desktop shortcut
+    - curtin in-target --target=/target -- bash -c "cat > /usr/share/applications/arduino-ide.desktop << 'EOF'\n[Desktop Entry]\nName=Arduino IDE\nExec=/opt/arduino-ide.AppImage\nIcon=arduino\nType=Application\nCategories=Development;\nEOF"
+
+    # Install Raspberry Pi Imager via official apt repository
+    - curtin in-target --target=/target -- bash -c "curl -fsSL https://archive.raspberrypi.com/debian/raspberrypi.gpg.key | gpg --dearmor -o /etc/apt/keyrings/raspberrypi.gpg"
+    - curtin in-target --target=/target -- bash -c "echo 'deb [signed-by=/etc/apt/keyrings/raspberrypi.gpg] https://archive.raspberrypi.com/debian/ bookworm main' > /etc/apt/sources.list.d/raspberrypi.list"
+    - curtin in-target --target=/target -- apt-get update -y
+    - curtin in-target --target=/target -- apt-get install -y rpi-imager
 
     # Install German language packs
     - curtin in-target --target=/target -- apt-get install -y language-pack-de
 
+    # Install Adafruit CircuitPython DHT library
+    - curtin in-target --target=/target -- pip3 install adafruit-circuitpython-dht --break-system-packages
+
     # Add azubi to sudo and adm groups (password required for sudo)
     - curtin in-target --target=/target -- usermod -aG sudo azubi
     - curtin in-target --target=/target -- usermod -aG adm azubi
-
-    # Install Adafruit CircuitPython DHT library in virtual environment
-    - curtin in-target --target=/target -- bash -c "python3 -m venv /home/azubi/venv"
-    - curtin in-target --target=/target -- bash -c "/home/azubi/venv/bin/pip install adafruit-circuitpython-dht"
-    - curtin in-target --target=/target -- bash -c "echo 'source /home/azubi/venv/bin/activate' >> /home/azubi/.bashrc"
-    - curtin in-target --target=/target -- chown -R azubi:azubi /home/azubi/venv
-
-    # Install Visual Studio Code (Snap)
-    - curtin in-target --target=/target -- snap install code --classic
-
-    # Install Arduino IDE (Snap)
-    - curtin in-target --target=/target -- snap install arduino --classic
-
-    # Install Raspberry Pi Imager (Snap)
-    - curtin in-target --target=/target -- snap install rpi-imager
 
     # Disable Apport crash reporter
     - curtin in-target --target=/target -- systemctl disable apport
